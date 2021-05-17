@@ -14,7 +14,7 @@
    - 仓库表 (repos)
      - 存储物品
 
-     ```
+     ```sql
      CREATE TABLE `repos` (
        `id` int unsigned NOT NULL AUTO_INCREMENT,
        `user_id` int DEFAULT NULL,
@@ -44,7 +44,7 @@
 
      - 用于记录标签频率
    
-     ```
+     ```sql
      CREATE TABLE `repos_labels` (
        `id` int unsigned NOT NULL AUTO_INCREMENT,
        `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
@@ -62,7 +62,7 @@
    
      - 记录通知
    
-     ```
+     ```sql
      CREATE TABLE `repos_notices` (
        `id` int unsigned NOT NULL AUTO_INCREMENT,
        `status` tinyint(1) NOT NULL DEFAULT '0',
@@ -80,7 +80,7 @@
    
      - 用户表
    
-     ```
+     ```sql
      CREATE TABLE `users` (
        `id` int unsigned NOT NULL AUTO_INCREMENT,
        `name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
@@ -99,7 +99,7 @@
 
 2. 安装依赖 & 编译前端文件
 
-   ```
+   ```bash
    cnpm install
    cd client && cnpm install && npm run build && cp ./dist/* ../server/public
    ```
@@ -115,7 +115,7 @@
 
    
 
-   ```json
+   ```js
    module.exports = {
      server: { host: '0.0.0.0', port: 8002 },
      mysql: {
@@ -154,7 +154,7 @@
 
    修改 users 表，新增一个 **id = 1** 的用户。
 
-   ```
+   ```sql
    INSERT INTO `users` (`id`, `name`, `username`, `password`, `dt`, `phone`, `email`, `chanify_tokens`)
    VALUES
    	(1, '张蛋蛋', 'zdd', NULL, '1111111111', NULL, NULL, '[]');
