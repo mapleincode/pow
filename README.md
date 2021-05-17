@@ -1,15 +1,39 @@
-# 家庭物品保质期管理系统
-- 支持物品录入
-- 过期物品通知
-  - 支持钉钉通知
-  - chanify 通知
-    -  [github.com/chanify/chanify/blob/main/README-zh_CN.md](http://github.com/chanify/chanify/blob/main/README-zh_CN.md)
+# POW
+
+HRP (Home Resource Planning) 。**[手动狗头]**
+
+家庭资源管理系统。
 
 
 
-## 安装
+已有的功能:
 
-1. 初始化 mysql 数据库表
+- 物品录入
+- 物品标签
+- 物品搜索
+- 物品临期 & 过期预警通知
+
+
+
+其中支持功能支持:
+
+- 钉钉机器人通知
+- chanify 通知
+
+
+
+未来可能支持:
+
+- 用户注册
+- 用户登录
+- 用户配置通知
+- imessage 通知
+
+
+
+## 数据库表
+
+> 需要 mysql-server 支持
 
    - 仓库表 (repos)
      - 存储物品
@@ -43,7 +67,7 @@
    - 物品标签表 (repos_labels)
 
      - 用于记录标签频率
-   
+     
      ```sql
      CREATE TABLE `repos_labels` (
        `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -61,7 +85,7 @@
    - 物品通知表
    
      - 记录通知
-   
+     
      ```sql
      CREATE TABLE `repos_notices` (
        `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -79,7 +103,7 @@
    - 用户表
    
      - 用户表
-   
+     
      ```sql
      CREATE TABLE `users` (
        `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -93,88 +117,119 @@
        PRIMARY KEY (`id`)
      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
      ```
-   
 
 
 
-2. 安装依赖 & 编译前端文件
+## 配置用户信息
 
-   ```bash
-   cnpm install
-   cd client && cnpm install && npm run build && cp ./dist/* ../server/public
-   ```
+修改 users 表，新增一个 **id = 1** 的用户。
 
-   
+```sql
+INSERT INTO `users` (`id`, `name`, `username`, `password`, `dt`, `phone`, `email`, `chanify_tokens`)
+VALUES
+	(1, '张蛋蛋', 'zdd', NULL, '1111111111', NULL, NULL, '[]');
+```
 
-3. 配置 config
+> 推送钉钉消息会 @ id = 1 的用户的手机号 (实际上，所有资源都是以 user.id = 1 的用户创建的，你也可以修改前端文件，接入用户系统)
 
-   ```bash
-   cp server/config.js.default server/config.js
-   vim config.js
-   ```
-
-   
-
-   ```js
-   module.exports = {
-     server: { host: '0.0.0.0', port: 8002 },
-     mysql: {
-       arku: {
-         host: '127.0.0.1',
-         port: 3306,
-         username: 'root',
-         password: '',
-         showSql: true
-       }
-     },
-     dtRobot: {
-       token: 'token',
-       secret: 'secret'
-     },
-     chanify: {
-       enable: false,
-       uri: ''
-     }
-   }
-   ```
-
-   sever: 监听端口
-
-   mysql: mysql 配置
-
-   doRobot: 钉钉机器人推送配置
-
-   chanify:  参考 [github.com/chanify/chanify/blob/main/README-zh_CN.md](http://github.com/chanify/chanify/blob/main/README-zh_CN.md)。默认可以不配置
-
-   
-
-   **arku 这个字段不可修改。**
-
-4. 在数据库配置用户信息
-
-   修改 users 表，新增一个 **id = 1** 的用户。
-
-   ```sql
-   INSERT INTO `users` (`id`, `name`, `username`, `password`, `dt`, `phone`, `email`, `chanify_tokens`)
-   VALUES
-   	(1, '张蛋蛋', 'zdd', NULL, '1111111111', NULL, NULL, '[]');
-   ```
-
-   > 推送钉钉消息会 @ id = 1 的用户的手机号
-
-   > chanify_token 参考 [github.com/chanify/chanify/blob/main/README-zh_CN.md](http://github.com/chanify/chanify/blob/main/README-zh_CN.md)。默认可以不配置
+> chanify_token 参考 [github.com/chanify/chanify/blob/main/README-zh_CN.md](http://github.com/chanify/chanify/blob/main/README-zh_CN.md)。
+>
+> json 字符串方式。
+>
+> 默认可以不配置。
 
 
 
+## 配置 config.js
+
+复制 `config.js.default`  > `config.js`
+
+```bash
+cp server/config.js.default server/config.js
+vim config.js
+```
 
 
-## Start
+
+修改 `config.js`
+
+```js
+module.exports = {
+  server: {
+    host: '0.0.0.0',
+    port: 8002 // 监听端口
+  },
+  mysql: {
+    arku: { // mysql 配置 p.s. arku 字段目前暂不支持修改
+      host: '127.0.0.1',
+      port: 3306,
+      username: 'root',
+      password: '',
+      showSql: true
+    }
+  },
+  dtRobot: { // 钉钉机器人配置
+    token: 'token',
+    secret: 'secret'
+  },
+  chanify: { // chanify 配置
+    enable: false,
+    uri: ''
+  }
+}
+```
+
+
+
+> chanify:  参考 [github.com/chanify/chanify/blob/main/README-zh_CN.md](http://github.com/chanify/chanify/blob/main/README-zh_CN.md)。
+>
+> 默认可以不配置
+
+
+
+## 安装
+
+```bash
+# 安装后端依赖
+cnpm install # 也可以使用 npm install
+
+# 安装前端依赖
+cd client && cnpm install
+
+# 编译前端文件
+npm run build
+
+# 复制文件到 server public 文件夹
+cp ./dist/* ../server/public
+```
+
+
+
+## 启动 (test)
 
 ```bash
 node app.js
 ```
 
-
-
 浏览器访问 http://127.0.0.1:8002 端口。
+
+
+
+## 启动 (prod)
+
+建议使用 pm2 进行管理:
+
+```
+cnpm install pm2 -g	
+```
+
+
+
+启动方式: 
+
+```bash
+cd pow
+pm2 start app.js --name=pow-server
+pm2 start crontab.js --name=pow-crontab # 定时任务，钉钉通知，可以不启动
+```
 
